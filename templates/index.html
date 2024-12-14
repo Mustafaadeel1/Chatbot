@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot 😊</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #000; 
+            margin: 0; 
+            padding: 0; 
+            color: white; 
+        }
+        .chat-container { 
+            max-width: 500px; 
+            margin: 50px auto; 
+            background: #1e1e1e; 
+            border-radius: 8px; 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); 
+            padding: 20px; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #ffcc00; 
+        }
+        .chat-box { 
+            max-height: 300px; 
+            overflow-y: auto; 
+            margin-bottom: 10px; 
+            border: 1px solid #444; 
+            padding: 10px; 
+            background: #2e2e2e; 
+            border-radius: 5px; 
+            color: white; 
+        }
+        .message-box { 
+            margin-bottom: 10px; 
+            padding: 10px; 
+            border-radius: 5px; 
+        }
+        .user-message { 
+            background-color: #4caf50; 
+            color: white; 
+            text-align: right; 
+        }
+        .bot-message { 
+            background-color: #f44336; 
+            color: white; 
+            text-align: left; 
+        }
+        input { 
+            width: 80%; 
+            padding: 10px; 
+            border: 1px solid #555; 
+            border-radius: 5px; 
+            background-color: #444; 
+            color: white; 
+        }
+        button { 
+            padding: 10px; 
+            border: none; 
+            background: #ffcc00; 
+            color: black; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #e6b800; 
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Mustafa's Chatbot 😊</h2>
+        <div id="chat-box" class="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        // Display welcome message only once when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatBox = document.getElementById("chat-box");
+            const welcomeMessage = document.createElement("div");
+            welcomeMessage.className = "message-box bot-message";
+            welcomeMessage.textContent = "Welcome to Mustafa's Chatbot 😊";
+            chatBox.appendChild(welcomeMessage);
+        });
+
+        async function sendMessage() {
+            const userInput = document.getElementById("user-input").value;
+            const chatBox = document.getElementById("chat-box");
+
+            if (userInput.trim() === "") return;
+
+            // Display user's message
+            const userMessage = document.createElement("div");
+            userMessage.className = "message-box user-message";
+            userMessage.textContent = userInput;
+            chatBox.appendChild(userMessage);
+
+            // Send message to backend
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userInput }),
+                });
+
+                const result = await response.json();
+                const botMessage = document.createElement("div");
+                botMessage.className = "message-box bot-message";
+                botMessage.textContent = result.response;
+                chatBox.appendChild(botMessage);
+            } catch (error) {
+                console.error("Error:", error);
+                const errorMessage = document.createElement("div");
+                errorMessage.className = "message-box bot-message";
+                errorMessage.textContent = "Sorry, something went wrong. Please try again.";
+                chatBox.appendChild(errorMessage);
+            }
+
+            // Clear input field
+            document.getElementById("user-input").value = "";
+
+            // Scroll chatbox to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
